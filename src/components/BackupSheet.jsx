@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ClipboardCopy, Download, Upload } from "lucide-react";
+import { ClipboardCopy, Download, MessageSquareText, Upload } from "lucide-react";
+import { CLAUDE_PROJECT_INSTRUCTIONS, claudeSummary } from "../lib/claude.js";
 import { backupFilename, buildBackup, parseBackup, summarize } from "../lib/backup.js";
 import { totalTasks } from "../lib/model.js";
 import { THEME, vars } from "../theme.js";
@@ -36,7 +37,7 @@ async function copyText(text) {
   }
 }
 
-export default function BackupSheet({ state, canUndo, importOnly = false, onBackedUp, onReplace, onAdd, onUndo, onClose }) {
+export default function BackupSheet({ state, canUndo, importOnly = false, themePref = "auto", onTheme, onBackedUp, onReplace, onAdd, onUndo, onClose }) {
   const [msg, setMsg] = useState(null); // { kind: "ok" | "err", text }
   const [pasted, setPasted] = useState("");
   const [preview, setPreview] = useState(null); // parsed incoming state
@@ -81,6 +82,19 @@ export default function BackupSheet({ state, canUndo, importOnly = false, onBack
     }
   };
 
+  const copyForClaude = async () => {
+    const ok = await copyText(claudeSummary(state));
+    setMsg(ok
+      ? { kind: "ok", text: "Task summary copied. Paste it into your Claude project chat." }
+      : { kind: "err", text: "Copy was blocked. Try again." });
+  };
+  const copyInstructions = async () => {
+    const ok = await copyText(CLAUDE_PROJECT_INSTRUCTIONS);
+    setMsg(ok
+      ? { kind: "ok", text: "Instructions copied. Paste them once into the Claude project's instructions." }
+      : { kind: "err", text: "Copy was blocked. Try again." });
+  };
+
   const check = (text) => {
     try {
       setPreview(parseBackup(text));
@@ -114,7 +128,7 @@ export default function BackupSheet({ state, canUndo, importOnly = false, onBack
   };
 
   return (
-    <Sheet title="Backup" theme={vars(THEME.wip)} onClose={onClose}>
+    <Sheet title="Backup & settings" theme={vars(THEME.wip)} onClose={onClose}>
       <p className="note mb">
         Your tasks live only on this phone. Deleting the home-screen icon or clearing Safari data erases them, so keep a backup file.
         {" "}{importOnly ? "" : last ? `Last backup: ${last.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}.` : "No backup yet."}
@@ -168,6 +182,30 @@ export default function BackupSheet({ state, canUndo, importOnly = false, onBack
               Check pasted text
             </button>
           </div>
+
+          {!importOnly && (
+            <>
+              <div className="divider">
+                <div className="label dim">Work with Claude</div>
+                <p className="note" style={{ marginBottom: 10 }}>
+                  Copies your open tasks as text to paste into your Claude project. Nothing is sent anywhere by the app.
+                </p>
+                <button className="opt mb" style={{ width: "100%" }} disabled={!has} onClick={copyForClaude}>
+                  <MessageSquareText size={15} /> Copy tasks for Claude
+                </button>
+                <button className="ghost" style={{ width: "100%" }} onClick={copyInstructions}>Copy instructions for the Claude project</button>
+              </div>
+
+              <div className="divider">
+                <div className="label dim">Appearance</div>
+                <div className="row">
+                  {[["auto", "Auto"], ["light", "Light"], ["dark", "Dark"]].map(([k, name]) => (
+                    <button key={k} className={`opt seg${themePref === k ? " on" : ""}`} aria-pressed={themePref === k} onClick={() => onTheme?.(k)}>{name}</button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
     </Sheet>

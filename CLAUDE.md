@@ -12,6 +12,8 @@ A **personal, offline task manager** that runs as a **home-screen web app on iPh
 - It is a faithful re-creation of an existing React prototype that runs inside Claude today: `reference/TaskManager.reference.jsx`. That file is the **visual and behavioural spec**. Its personal data has been removed.
 - One user, one phone. All data lives on the phone. Backup is a JSON file the user exports and keeps.
 
+**Working with Claude (added 14 Nov 2026):** there is no automatic link to a Claude project — that would need a server. The gear sheet has "Copy tasks for Claude" (a text summary of open tasks) and "Copy instructions for the Claude project". Claude answers with `UPDATE: 1. … 2. …`, which the owner pastes into Quick add. Keep it copy-and-paste only.
+
 **Not in scope:** accounts, sync, a server, analytics, notifications, an App Store build. If an idea needs any of these, write it in `BACKLOG.md` and do not build it.
 
 > There may be older files about an Expo / App Store version of this product (`TASK_COMMANDER_HANDOVER.md`). That is a different, later project. Ignore it here.
@@ -85,8 +87,8 @@ The stored value and the backup file use **the same shape**:
 
 - **Six tabs, in this order:** WIP · Work · Personal · Seva · AI Learning · Super Matrix. App opens on **Work**. WIP shows a badge with its count.
 - **The header and tab bar stay frozen at the top while content scrolls.** The owner asked for this specifically. Do not move tabs to the bottom.
-- Each tab keeps its own background world: Work dark blue `#060e1f`, Personal dark green `#050f08`, Seva dark orange `#150800`, WIP dark violet `#0d0b18`, AI Learning near-black with per-sub-tab colours, **Super Matrix white**.
-- Header: title, global progress (done / total across Work + Personal + Seva), "✓ Saved" badge.
+- **Colour scheme (changed by the owner on 14 Nov 2026, after testing on the iPhone):** one calm neutral scheme, light or dark, following the phone's setting (Auto / Light / Dark under the gear). The original per-tab dark colour worlds were hard to work in and are gone. Each tab keeps its colour only as an accent (headings, active tab, buttons): Work blue, Personal green, Seva orange, WIP violet, AI sub-tabs pink / emerald / violet / orange. The header stays dark in both modes so the iOS status bar is readable. **Super Matrix stays white** in both modes. Do not bring back coloured page backgrounds without asking.
+- Header: title, global progress (done / total across Work + Personal + Seva), "✓ Saved" badge, a "+" quick-add button (opens a capture sheet from any tab; items go to WIP) and the gear.
 - **Domain tabs (Work / Personal / Seva):** title, "x of y done", progress bar, **+ New Task** button → Eisenhower 2×2 of incomplete tasks (collapsible cells with counts) → "All Tasks" grouped by `group`, each group showing done/total.
 - **Task row:** complete checkbox (done = strike-through, dimmed, removed from matrices but kept in the list), Urgent toggle (red), Important toggle (amber), Edit.
 - **Edit sheet:** rewrite text, move between Work / Personal / Seva, toggle Urgent / Important, Save, Cancel, Delete with a confirm step.

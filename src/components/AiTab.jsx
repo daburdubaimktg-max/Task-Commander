@@ -63,7 +63,7 @@ export default function AiTab({ ai, labels, setData, sub, setSub }) {
 
       <div className="subtabs" role="tablist">
         {AI_KEYS.map((k) => (
-          <button key={k} role="tab" aria-selected={sub === k} className={`tab${sub === k ? " on" : ""}`} style={{ "--c": AI_SUB[k].light }}
+          <button key={k} role="tab" aria-selected={sub === k} className={`tab${sub === k ? " on" : ""}`} style={vars(AI_SUB[k])}
             onClick={() => { setSub(k); setEditingId(null); }}>
             {labels[k]}
           </button>
@@ -82,7 +82,7 @@ export default function AiTab({ ai, labels, setData, sub, setSub }) {
         <div className="section">
           <div className="label">Eisenhower Matrix</div>
           <div className="grid2">
-            {MATRIX_CFG.map((cfg) => <MatrixCell key={cfg.key} cfg={cfg} tasks={matrix[cfg.key]} color={S.light} />)}
+            {MATRIX_CFG.map((cfg) => <MatrixCell key={cfg.key} cfg={cfg} tasks={matrix[cfg.key]} />)}
           </div>
         </div>
 

@@ -35,7 +35,7 @@ export default function Recovery({ blocked, onImport, onStartFresh }) {
     <div className="content">
       <div className="page" style={{ ...vars(THEME.wip), paddingTop: "calc(24px + env(safe-area-inset-top))" }}>
         <div className="card pad">
-          <h2 style={{ fontSize: 19, color: "#fca5a5", marginBottom: 8 }}>Your saved tasks could not be read</h2>
+          <h2 className="danger-title">Your saved tasks could not be read</h2>
           {raw === null ? (
             <p className="note mb">
               The phone did not let the app read its saved data just now. Nothing has been changed or deleted.

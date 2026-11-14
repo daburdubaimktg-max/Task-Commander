@@ -3,7 +3,7 @@ import { flushSync } from "react-dom";
 import { Briefcase, Heart, Inbox, LayoutGrid, Plus, Settings, User, X, Zap } from "lucide-react";
 import { DOMAINS, defaultState, groupsOf, newId } from "./lib/model.js";
 import { backupNudge, mergeAdd } from "./lib/backup.js";
-import { NUDGE_KEY, PERSIST_KEY, PREV_KEY, getItem, keepUnreadable, loadState, removeItem, saveState, setItem } from "./lib/storage.js";
+import { NUDGE_KEY, PERSIST_KEY, PREV_KEY, THEME_KEY, getItem, keepUnreadable, loadState, removeItem, saveState, setItem } from "./lib/storage.js";
 import { THEME, vars } from "./theme.js";
 import DomainTab from "./components/DomainTab.jsx";
 import WipTab from "./components/WipTab.jsx";
@@ -35,7 +35,24 @@ export default function App() {
   const captureRef = useRef(null);
   const [undo, setUndo] = useState(null);
   const [nudgeDismissedAt, setNudgeDismissedAt] = useState(() => getItem(NUDGE_KEY));
+  const [themePref, setThemePref] = useState(() => getItem(THEME_KEY) || "auto");
   const lastSaved = useRef(store);
+
+  // Light / dark: "auto" follows the phone and switches live when the phone does.
+  useEffect(() => {
+    const mq = window.matchMedia?.("(prefers-color-scheme: dark)");
+    const apply = () => {
+      const dark = themePref === "dark" || (themePref !== "light" && !!mq?.matches);
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    };
+    apply();
+    mq?.addEventListener?.("change", apply);
+    return () => mq?.removeEventListener?.("change", apply);
+  }, [themePref]);
+  const chooseTheme = (pref) => {
+    setItem(THEME_KEY, pref);
+    setThemePref(pref);
+  };
   const tabRefs = useRef({});
 
   // Save on every change. "✓ Saved" shows only after a confirmed write; a failure stays visible.
@@ -175,12 +192,12 @@ export default function App() {
   };
 
   const TABS = [
-    { key: "wip", Icon: Inbox, label: "WIP", color: THEME.wip.light, badge: data.wip.length },
-    { key: "work", Icon: Briefcase, label: labels.work, color: THEME.work.light },
-    { key: "personal", Icon: User, label: labels.personal, color: THEME.personal.light },
-    { key: "seva", Icon: Heart, label: labels.seva, color: THEME.seva.light },
-    { key: "ai", Icon: Zap, label: labels.ai, color: "#a78bfa" },
-    { key: "matrix", Icon: LayoutGrid, label: "Super Matrix", color: "#c9ced8" },
+    { key: "wip", Icon: Inbox, label: "WIP", t: THEME.wip, badge: data.wip.length },
+    { key: "work", Icon: Briefcase, label: labels.work, t: THEME.work },
+    { key: "personal", Icon: User, label: labels.personal, t: THEME.personal },
+    { key: "seva", Icon: Heart, label: labels.seva, t: THEME.seva },
+    { key: "ai", Icon: Zap, label: labels.ai, t: THEME.ai },
+    { key: "matrix", Icon: LayoutGrid, label: "Super Matrix", t: THEME.matrix },
   ];
 
   const welcomeCard = welcome && (
@@ -232,9 +249,9 @@ export default function App() {
         </div>
 
         <div className="tabs" role="tablist">
-          {TABS.map(({ key, Icon, label, color, badge }) => (
+          {TABS.map(({ key, Icon, label, t, badge }) => (
             <button key={key} ref={(el) => { tabRefs.current[key] = el; }} role="tab" aria-selected={tab === key}
-              className={`tab${tab === key ? " on" : ""}`} style={{ "--c": color }} onClick={() => setTab(key)}>
+              className={`tab${tab === key ? " on" : ""}`} style={vars(t)} onClick={() => setTab(key)}>
               <Icon size={15} />{label}
               {badge > 0 && <span className="badge">{badge}</span>}
             </button>
@@ -271,7 +288,7 @@ export default function App() {
         <QuickCapture ref={captureRef} text={wipDraft} setText={setWipDraft} onAdd={addToWip} onClose={() => setCaptureOpen(false)} />
       )}
       {backupOpen && (
-        <BackupSheet state={store} canUndo={!!undo} onBackedUp={markBackedUp} onReplace={importReplace} onAdd={importAdd}
+        <BackupSheet state={store} canUndo={!!undo} themePref={themePref} onTheme={chooseTheme} onBackedUp={markBackedUp} onReplace={importReplace} onAdd={importAdd}
           onUndo={undoImport} onClose={() => setBackupOpen(false)} />
       )}
     </div>

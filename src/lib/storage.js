@@ -7,6 +7,7 @@ export const PREV_KEY = "tcc_data_v1_prev";
 export const CORRUPT_KEY = "tcc_data_v1_corrupt";
 export const NUDGE_KEY = "tcc_nudge_dismissed_at";
 export const PERSIST_KEY = "tcc_persist_requested";
+export const THEME_KEY = "tcc_theme"; // "auto" | "light" | "dark"
 
 const store = (s) => s || globalThis.localStorage;
 

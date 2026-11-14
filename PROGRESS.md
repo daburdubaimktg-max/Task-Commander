@@ -7,7 +7,7 @@
 - All of CLAUDE.md §6: iPhone shell (safe areas, 44 pt targets, 16 px fields, offline service worker, icons),
   paste box in WIP, WIP → AI sub-tabs, suggested group, Backup sheet (export, copy, import with preview,
   replace / add, undo import, 7-day nudge, welcome card), data fixes (no seed merge, one WIP list, UUID ids, visible save failures).
-- 65 unit tests (`npm test`), run by the deploy workflow before every deploy.
+- 67 unit tests (`npm test`), run by the deploy workflow before every deploy.
 - Deploy workflow: `.github/workflows/deploy.yml` (push to `main` → test → build → GitHub Pages).
 
 ## Live URL
@@ -72,6 +72,14 @@ button names the destination); the "groups" figure in the import preview counts 
 A "+" button in the header opens a capture sheet from any tab with the text box already focused, so the
 keyboard — typing or a dictation keyboard such as Wispr Flow — comes up in one tap. Items go to WIP. The
 draft is shared with the WIP paste box, so closing the sheet never loses dictated text.
+
+## Colour scheme and Claude buttons (14 Nov 2026)
+
+- The owner found the per-tab dark colour worlds hard to work in. Replaced by one neutral scheme, light or
+  dark, following the phone (Auto / Light / Dark under the gear). Tab colours remain as accents only. All
+  visible text measured at 4.5:1 or better in both modes on six screens.
+- Gear sheet: "Copy tasks for Claude" and "Copy instructions for the Claude project". Copy-and-paste only;
+  the app still sends nothing anywhere.
 
 ## Next step
 

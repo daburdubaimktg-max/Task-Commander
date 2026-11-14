@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { backupFilename, backupNudge, buildBackup, mergeAdd, parseBackup, summarize } from "../src/lib/backup.js";
 import { BackupError, countTasks, defaultState, groupsOf } from "../src/lib/model.js";
+import { CLAUDE_PROJECT_INSTRUCTIONS, claudeSummary } from "../src/lib/claude.js";
 import { CORRUPT_KEY, KEY, keepUnreadable, loadState, saveState } from "../src/lib/storage.js";
 
 const fixtureText = readFileSync(new URL("../fixtures/sample-backup.json", import.meta.url), "utf8");
@@ -211,5 +212,24 @@ describe("storage", () => {
     expect(keepUnreadable("first", st)).toBe(true);
     keepUnreadable("second", st);
     expect(st.getItem(CORRUPT_KEY)).toBe("first");
+  });
+});
+
+describe("copy for Claude", () => {
+  it("lists open tasks by tab and quadrant, with groups, and never lists completed ones", () => {
+    const text = claudeSummary(parseBackup(fixtureText), new Date(2026, 10, 14));
+    expect(text).toContain("TASK COMMAND CENTER — my current tasks (14 Nov 2026)");
+    expect(text).toContain("## Work — 3 open, 1 done");
+    expect(text).toContain("Do First:\n- [Planning] Prepare Monday team review");
+    expect(text).toContain("Delegate:\n- [Admin] Clear expense claims");
+    expect(text).not.toContain("Review agency media plan"); // completed
+    expect(text).toContain("### TEAM AI — 1 open, 0 done\nSchedule:\n- Write five prompt templates for the team");
+    expect(text).toContain("### COMMUNITY — 0 open, 0 done");
+    expect(text).toContain("## WIP — 2 not sorted yet\n- Call the plumber");
+    expect(text).toContain("UPDATE: 1. first task 2. second task");
+  });
+  it("works on an empty list and the project instructions name the UPDATE format", () => {
+    expect(claudeSummary(defaultState(), new Date(2026, 0, 2))).toContain("## Work — 0 open, 0 done");
+    expect(CLAUDE_PROJECT_INSTRUCTIONS).toContain("UPDATE: 1. first task 2. second task 3. third task");
   });
 });

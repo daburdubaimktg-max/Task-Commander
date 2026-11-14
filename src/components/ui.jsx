@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { cellVars } from "../theme.js";
 import { AlertCircle, Check, ChevronDown, ChevronUp, Edit2, Star, Trash2, X } from "lucide-react";
 
 export function Sheet({ title, theme, onClose, children }) {
@@ -35,12 +36,10 @@ export function Sheet({ title, theme, onClose, children }) {
 export function PriorityButtons({ urgent, important, onUrgent, onImportant }) {
   return (
     <div className="row mb">
-      <button className={`opt${urgent ? " on" : ""}`} aria-pressed={urgent} onClick={onUrgent}
-        style={{ "--on": "#ef4444", "--fill": "rgba(239,68,68,0.15)", "--txt": "#f87171" }}>
+      <button className={`opt urgent${urgent ? " on" : ""}`} aria-pressed={urgent} onClick={onUrgent}>
         <AlertCircle size={15} /> Urgent
       </button>
-      <button className={`opt${important ? " on" : ""}`} aria-pressed={important} onClick={onImportant}
-        style={{ "--on": "#f59e0b", "--fill": "rgba(245,158,11,0.15)", "--txt": "#fcd34d" }}>
+      <button className={`opt important${important ? " on" : ""}`} aria-pressed={important} onClick={onImportant}>
         <Star size={15} /> Important
       </button>
     </div>
@@ -84,10 +83,10 @@ export function DeleteConfirm({ onDelete }) {
 }
 
 // Collapsible Eisenhower cell, dark worlds.
-export function MatrixCell({ cfg, tasks, color }) {
+export function MatrixCell({ cfg, tasks }) {
   const [open, setOpen] = useState(true);
   return (
-    <div className="mcell" style={{ "--mb": `${cfg.border}99`, "--mc": cfg.onDark, "--ic": color }}>
+    <div className="mcell" style={cellVars(cfg)}>
       <button className="mcell-head" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         <span>
           <span className="mcell-title">{cfg.label}</span>
@@ -95,7 +94,7 @@ export function MatrixCell({ cfg, tasks, color }) {
         </span>
         <span className="mcell-count">
           {tasks.length}
-          {open ? <ChevronUp size={15} color="#9aa3b5" /> : <ChevronDown size={15} color="#9aa3b5" />}
+          {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
         </span>
       </button>
       {open && (

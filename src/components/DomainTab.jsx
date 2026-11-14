@@ -18,8 +18,8 @@ function EditSheet({ task, domain, labels, groupsByDomain, onSave, onDelete, onC
       <div className="label dim">Domain</div>
       <div className="row mb">
         {DOMAINS.map((opt) => (
-          <button key={opt} className={`opt${d === opt ? " on" : ""}`} aria-pressed={d === opt} onClick={() => setD(opt)}
-            style={{ "--b": THEME[opt].border, "--on": THEME[opt].light, "--fill": THEME[opt].accent }}>
+          <button key={opt} className={`opt dest${d === opt ? " on" : ""}`} aria-pressed={d === opt} onClick={() => setD(opt)}
+            style={vars(THEME[opt])}>
             {labels[opt]}
           </button>
         ))}
@@ -29,7 +29,7 @@ function EditSheet({ task, domain, labels, groupsByDomain, onSave, onDelete, onC
       <div className="label dim">Priority</div>
       <PriorityButtons urgent={u} important={i} onUrgent={() => setU((x) => !x)} onImportant={() => setI((x) => !x)} />
       <div className="row">
-        <button className="primary f2" style={{ "--light": THEME[d].light }}
+        <button className="primary f2" style={vars(THEME[d])}
           onClick={() => onSave(d, { task: txt.trim() || task.task, group: canonGroup(grp, groupsByDomain[d]), urgent: u, important: i })}>
           ✓ Save Changes
         </button>
@@ -129,7 +129,7 @@ export default function DomainTab({ domain, labels, tasks, groupsByDomain, setDa
       <div className="section">
         <div className="label">Eisenhower Matrix (Active Tasks Only)</div>
         <div className="grid2">
-          {MATRIX_CFG.map((cfg) => <MatrixCell key={cfg.key} cfg={cfg} tasks={matrix[cfg.key]} color={T.light} />)}
+          {MATRIX_CFG.map((cfg) => <MatrixCell key={cfg.key} cfg={cfg} tasks={matrix[cfg.key]} />)}
         </div>
       </div>
 

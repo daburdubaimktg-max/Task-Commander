@@ -33,15 +33,14 @@ function WipCard({ item, labels, groupsByDomain, onChange, onSend, onDiscard }) 
   const destButton = (opt) => {
     const t = themeOf(opt);
     return (
-      <button key={opt} className={`opt${dest === opt ? " on" : ""}`} aria-pressed={dest === opt} onClick={() => pick(opt)}
-        style={{ "--b": t.border, "--on": t.light, "--fill": DOMAINS.includes(opt) ? t.accent : t.border }}>
+      <button key={opt} className={`opt dest${dest === opt ? " on" : ""}`} aria-pressed={dest === opt} onClick={() => pick(opt)} style={vars(t)}>
         {labels[opt]}
       </button>
     );
   };
   return (
     <div className="card pad" style={{ marginBottom: 14 }}>
-      <p style={{ fontSize: 15, color: "#d4c8ff", lineHeight: 1.5, marginBottom: 14, overflowWrap: "anywhere" }}>{item.task}</p>
+      <p className="wip-text">{item.task}</p>
 
       <div className="label dim">Step 1 — Domain</div>
       <div className="row" style={{ marginBottom: 8 }}>{DOMAINS.map(destButton)}</div>
@@ -59,7 +58,7 @@ function WipCard({ item, labels, groupsByDomain, onChange, onSend, onDiscard }) 
         onUrgent={() => onChange({ urgent: !item.urgent })} onImportant={() => onChange({ important: !item.important })} />
 
       <div className="row">
-        <button className="primary f2" disabled={!dest} style={dest ? { "--light": themeOf(dest).light } : undefined}
+        <button className="primary f2" disabled={!dest} style={dest ? vars(themeOf(dest)) : undefined}
           onClick={() => onSend(isDomain ? canonGroup(group, groupsByDomain[dest]) : "")}>
           {dest ? `✓ Send to ${destLabel}` : "Select a domain first"}
         </button>
@@ -101,7 +100,7 @@ export default function WipTab({ items, labels, groupsByDomain, setData, draft, 
 
   return (
     <div className="page" style={vars(T)}>
-      <h2 style={{ fontSize: 19, fontWeight: 800, color: T.light }}>WIP</h2>
+      <h2 className="page-title">WIP</h2>
       <p className="muted" style={{ marginBottom: 16 }}>
         Assign domain + priority, then Send. Task disappears from here and goes live instantly.
       </p>
@@ -110,7 +109,7 @@ export default function WipTab({ items, labels, groupsByDomain, setData, draft, 
 
       {items.length === 0 ? (
         <div className="card empty">
-          <Inbox size={30} color="#7c8598" style={{ marginBottom: 8 }} />
+          <Inbox size={30} style={{ marginBottom: 8 }} />
           <p>No tasks waiting</p>
           <p className="muted" style={{ marginTop: 6 }}>Paste a list above — “UPDATE: 1. … 2. …” works too</p>
         </div>

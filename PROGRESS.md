@@ -12,8 +12,10 @@
 
 ## Live URL
 
-The code is on `main`. The site goes live at `https://<github-user>.github.io/<repo-name>/` once
-**Settings → Pages → Source** is set to **GitHub Actions** and the deploy workflow has run.
+`https://<github-user>.github.io/<repo-name>/` — deployed from `main` by `.github/workflows/deploy.yml`.
+
+Setup that was needed once: **Settings → Pages → Source: GitHub Actions**, and `main` allowed under
+**Settings → Environments → github-pages → Deployment branches**.
 
 ## Verified
 

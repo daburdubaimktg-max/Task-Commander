@@ -1,4 +1,4 @@
-import { AI_KEYS, BackupError, DOMAINS, FORMAT, SCHEMA_VERSION, countTasks, normalizeState, totalTasks } from "./model.js";
+import { AI_KEYS, BackupError, DEFAULT_LABELS, DOMAINS, FORMAT, SCHEMA_VERSION, countTasks, newId, normalizeState, totalTasks } from "./model.js";
 
 export const NUDGE_AFTER_DAYS = 7;
 const DAY = 24 * 60 * 60 * 1000;
@@ -23,8 +23,10 @@ export function backupFilename(now = new Date()) {
 export function parseBackup(text) {
   if (typeof text !== "string" || !text.trim()) throw new BackupError("Nothing to import yet. Choose a file or paste the backup text.");
   let raw;
+  // Text pasted through Notes or a chat app may arrive with a byte-order mark or inside ``` fences.
+  const body = text.replace(/^\uFEFF/, "").trim().replace(/^```[a-z]*\s*/i, "").replace(/```\s*$/, "").trim();
   try {
-    raw = JSON.parse(text.trim());
+    raw = JSON.parse(body);
   } catch {
     throw new BackupError("This is not a backup file: the text could not be read. Paste the whole backup, from the first { to the last }.");
   }
@@ -41,27 +43,56 @@ export function summarize(state) {
   return `Work ${c.work} · Personal ${c.personal} · Seva ${c.seva} · AI ${c.ai} · WIP ${c.wip} — groups ${c.groups}`;
 }
 
-// "Add to existing": keeps everything already here and skips incoming tasks whose id exists.
+// "Add to existing": keeps everything already here.
+// - An incoming task that is already here (same id and text, or the same text in the same list) is skipped.
+// - An incoming task whose id is used by a different task here is added under a new id, not dropped.
+// - Tab names come from the file only where the file really names them; otherwise yours are kept.
+// Returns { state, added, skipped }.
 export function mergeAdd(current, incoming) {
-  const seen = new Set([
-    ...DOMAINS.flatMap((k) => current.data[k]),
-    ...current.data.wip,
-    ...AI_KEYS.flatMap((k) => current.data.ai[k]),
-  ].map((t) => t.id));
-  const add = (mine, theirs) => [...mine, ...theirs.filter((t) => !seen.has(t.id))];
+  const lists = (st) => [
+    ...DOMAINS.map((k) => [k, st.data[k]]),
+    ["wip", st.data.wip],
+    ...AI_KEYS.map((k) => [k, st.data.ai[k]]),
+  ];
+  const byId = new Map();
+  for (const [, list] of lists(current)) for (const t of list) byId.set(t.id, t);
+  const sig = (t) => `${t.group ?? ""}\u0000${t.task}`;
+  let added = 0, skipped = 0;
+  const add = (mine, theirs) => {
+    const here = new Set(mine.map(sig));
+    const out = [...mine];
+    for (const t of theirs) {
+      const same = byId.get(t.id);
+      if ((same && same.task === t.task) || here.has(sig(t))) { skipped++; continue; }
+      const fresh = same ? { ...t, id: newId() } : t;
+      byId.set(fresh.id, fresh);
+      here.add(sig(fresh));
+      out.push(fresh);
+      added++;
+    }
+    return out;
+  };
   const data = { ...current.data, ai: { ...current.data.ai } };
   for (const k of DOMAINS) data[k] = add(current.data[k], incoming.data[k]);
   data.wip = add(current.data.wip, incoming.data.wip);
   for (const k of AI_KEYS) data.ai[k] = add(current.data.ai[k], incoming.data.ai[k]);
-  return { ...current, labels: { ...incoming.labels }, data };
+  const labels = { ...current.labels };
+  for (const k of Object.keys(DEFAULT_LABELS)) {
+    if (incoming.labels[k] !== DEFAULT_LABELS[k]) labels[k] = incoming.labels[k];
+  }
+  const meta = { ...current.meta, lastBackupAt: current.meta.lastBackupAt ?? (totalTasksOf(current) === 0 ? incoming.meta.lastBackupAt : null) };
+  return { state: { ...current, labels, meta, data }, added, skipped };
 }
+
+const totalTasksOf = (st) => totalTasks(st);
 
 // null = no nudge. Otherwise the text for the amber bar.
 export function backupNudge(state, now = Date.now(), dismissedAt = null) {
   if (totalTasks(state) === 0) return null;
-  if (dismissedAt && now - Number(dismissedAt) < DAY) return null;
+  const since = now - Number(dismissedAt);
+  if (dismissedAt && since >= 0 && since < DAY) return null; // a dismissal "in the future" (clock change) does not count
   const last = state.meta.lastBackupAt ? Date.parse(state.meta.lastBackupAt) : NaN;
-  if (Number.isNaN(last)) return "Not backed up yet";
+  if (Number.isNaN(last) || last - now > DAY) return "Not backed up yet"; // a backup dated well in the future cannot be trusted
   const days = Math.floor((now - last) / DAY);
   return days >= NUDGE_AFTER_DAYS ? `Last backup ${days} days ago` : null;
 }

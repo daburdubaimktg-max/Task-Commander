@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { suggestGroup } from "../src/lib/suggestGroup.js";
 import { getMatrix, quadrantOf, superMatrixTasks } from "../src/lib/matrix.js";
-import { defaultState } from "../src/lib/model.js";
+import { canonGroup, defaultState } from "../src/lib/model.js";
 
 describe("suggestGroup", () => {
   it("prefers an existing group named in the task", () => {
@@ -26,6 +26,26 @@ describe("suggestGroup", () => {
     expect(suggestGroup("Unpaid leave form")).toBe("Inbox");
     expect(suggestGroup("Pay school fees", ["FINANCE"])).toBe("FINANCE");
     expect(suggestGroup("Plan the homework rota", ["Home"])).toBe("Inbox");
+    for (const t of ["Payroll query", "Bankrupt supplier list", "Doctoral thesis notes", "Buyer feedback", "Visit shopkeeper", "Transferable skills"]) {
+      expect(suggestGroup(t), t).toBe("Inbox");
+    }
+    for (const t of ["Make the payment", "Paid invoices check", "Banking forms", "Transferred funds"]) {
+      expect(suggestGroup(t), t).toBe("Finance");
+    }
+    expect(suggestGroup("Go shopping")).toBe("Shopping");
+    expect(suggestGroup("Book physiotherapy")).toBe("Health");
+  });
+  it("copes with odd group lists", () => {
+    expect(suggestGroup("Pay fees", null)).toBe("Finance");
+    expect(suggestGroup("Ship R&D (EU) sample", ["R&D (EU)", 7, ""])).toBe("R&D (EU)");
+  });
+});
+
+describe("canonGroup", () => {
+  it("reuses the existing spelling and falls back to Inbox", () => {
+    expect(canonGroup("planning ", ["Planning", "Admin"])).toBe("Planning");
+    expect(canonGroup("New one", ["Planning"])).toBe("New one");
+    expect(canonGroup("   ", ["Planning"])).toBe("Inbox");
   });
 });
 

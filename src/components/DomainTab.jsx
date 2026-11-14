@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
-import { DEFAULT_GROUP, DOMAINS, newId } from "../lib/model.js";
+import { DOMAINS, canonGroup, newId } from "../lib/model.js";
 import { getMatrix } from "../lib/matrix.js";
 import { MATRIX_CFG, THEME, vars } from "../theme.js";
 import { DeleteConfirm, GroupPicker, MatrixCell, PriorityButtons, Progress, Sheet, TaskRow } from "./ui.jsx";
@@ -14,7 +14,7 @@ function EditSheet({ task, domain, labels, groupsByDomain, onSave, onDelete, onC
   return (
     <Sheet title="Edit Task" theme={vars(THEME.wip)} onClose={onClose}>
       <div className="label dim">Task Text</div>
-      <textarea className="field mb" rows={3} value={txt} onChange={(e) => setTxt(e.target.value)} />
+      <textarea className="field mb" rows={3} value={txt} onChange={(e) => setTxt(e.target.value)} aria-label="Task text" />
       <div className="label dim">Domain</div>
       <div className="row mb">
         {DOMAINS.map((opt) => (
@@ -30,7 +30,7 @@ function EditSheet({ task, domain, labels, groupsByDomain, onSave, onDelete, onC
       <PriorityButtons urgent={u} important={i} onUrgent={() => setU((x) => !x)} onImportant={() => setI((x) => !x)} />
       <div className="row">
         <button className="primary f2" style={{ "--light": THEME[d].light }}
-          onClick={() => onSave(d, { task: txt.trim() || task.task, group: grp.trim() || DEFAULT_GROUP, urgent: u, important: i })}>
+          onClick={() => onSave(d, { task: txt.trim() || task.task, group: canonGroup(grp, groupsByDomain[d]), urgent: u, important: i })}>
           ✓ Save Changes
         </button>
         <button className="ghost" onClick={onClose}>Cancel</button>
@@ -49,13 +49,13 @@ function NewTaskSheet({ domain, label, groups, onAdd, onClose }) {
   return (
     <Sheet title={`New ${label} Task`} theme={vars(THEME[domain])} onClose={onClose}>
       <div className="label dim">Task</div>
-      <textarea className="field mb" rows={3} value={txt} onChange={(e) => setTxt(e.target.value)} placeholder="Describe the task..." />
+      <textarea className="field mb" rows={3} value={txt} onChange={(e) => setTxt(e.target.value)} placeholder="Describe the task..." aria-label="Task" />
       <div className="label dim">Group / Category</div>
       <GroupPicker value={grp} onChange={setGrp} groups={groups} />
       <div className="label dim">Priority</div>
       <PriorityButtons urgent={u} important={i} onUrgent={() => setU((x) => !x)} onImportant={() => setI((x) => !x)} />
       <button className="primary" disabled={!ok}
-        onClick={() => { onAdd({ task: txt.trim(), group: grp.trim() || DEFAULT_GROUP, urgent: u, important: i }); onClose(); }}>
+        onClick={() => { onAdd({ task: txt.trim(), group: canonGroup(grp, groups), urgent: u, important: i }); onClose(); }}>
         ✓ Add Task
       </button>
     </Sheet>

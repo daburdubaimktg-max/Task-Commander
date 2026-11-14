@@ -7,13 +7,13 @@
 - All of CLAUDE.md §6: iPhone shell (safe areas, 44 pt targets, 16 px fields, offline service worker, icons),
   paste box in WIP, WIP → AI sub-tabs, suggested group, Backup sheet (export, copy, import with preview,
   replace / add, undo import, 7-day nudge, welcome card), data fixes (no seed merge, one WIP list, UUID ids, visible save failures).
-- 43 unit tests (`npm test`), run by the deploy workflow before every deploy.
+- 65 unit tests (`npm test`), run by the deploy workflow before every deploy.
 - Deploy workflow: `.github/workflows/deploy.yml` (push to `main` → test → build → GitHub Pages).
 
 ## Live URL
 
-Not live yet. It will be `https://<github-user>.github.io/<repo-name>/` once the code is on `main`
-and **Settings → Pages → Source** is set to **GitHub Actions**.
+The code is on `main`. The site goes live at `https://<github-user>.github.io/<repo-name>/` once
+**Settings → Pages → Source** is set to **GitHub Actions** and the deploy workflow has run.
 
 ## Verified
 
@@ -36,6 +36,34 @@ and **Settings → Pages → Source** is set to **GitHub Actions**.
 - Super Matrix text uses darker shades of each tab's colour, because the original light shades are hard to read on white.
 - **Copy backup text** also counts as a backup for the 7-day nudge.
 - Vite `base` is `./`, so the app works under any repo name without a config change.
+
+## Audit (14 Nov 2026) and what it changed
+
+Twenty independent test passes covered: messy pasted lists, the splitter and group suggester, a 101-task
+dataset, hostile backup files, unicode round trips, storage failures, a second app on the same origin,
+offline and updates, five screen sizes, contrast, edit / WIP / AI flows, matrix correctness, import and undo,
+the backup nudge, iOS specifics, two code reviews, privacy and deploy.
+
+Fixed as a result:
+
+- **Unreadable saved data is never overwritten.** The app shows a recovery screen (keep a copy, import a
+  backup, or start empty with a confirm) and saves nothing until the user chooses. One damaged task is
+  skipped on load instead of hiding the whole list.
+- **Undo import** is withdrawn as soon as anything is edited after the import.
+- **Add to existing** keeps your tab names when the file has none, never duplicates on a repeat, adds
+  (rather than drops) a different task that reuses an id, and reports "N added, M skipped".
+- **Paste box:** ordinary sentences with "1. … 2. …" are no longer split; numbers inside a numbered item,
+  semicolons, empty items and dash bullets are handled; `UPDATE THE REPORT` keeps its first word.
+- **Group suggestion** matches whole words only. A group typed in other capitals joins the existing group.
+  A group typed on a WIP card is kept across tab switches and reloads.
+- **Double taps** can no longer confirm a delete, send the next WIP card, or close a sheet just opened.
+- **Readability:** dark text on the bright buttons (the white text measured under 3:1), stronger badge and
+  Super Matrix colours, long unbroken group and tab names wrap.
+- **Older iPhones (iOS 16.0–16.1):** the visual polish is applied only where the browser supports it.
+- The backup nudge refreshes when the app returns to the front; a failed save is retried then too.
+
+Left as is, on purpose: a half-typed AI task follows you between sub-tabs (same as the reference, and the
+button names the destination); the "groups" figure in the import preview counts groups per tab.
 
 ## Next step
 

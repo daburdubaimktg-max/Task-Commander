@@ -10,7 +10,6 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "apple-touch-icon.png"],
       manifest: {
         name: "Task Command Center",
         short_name: "Tasks",

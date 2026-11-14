@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { useRef } from "react";
 import { Inbox } from "lucide-react";
-import { AI_KEYS, DEFAULT_GROUP, DOMAINS, newId } from "../lib/model.js";
+import { AI_KEYS, DEFAULT_GROUP, DOMAINS, canonGroup, newId } from "../lib/model.js";
 import { splitTasks } from "../lib/splitTasks.js";
 import { suggestGroup } from "../lib/suggestGroup.js";
 import { THEME, themeOf, vars } from "../theme.js";
 import { GroupPicker, PriorityButtons } from "./ui.jsx";
 
-function PasteBox({ onAdd }) {
-  const [text, setText] = useState("");
+function PasteBox({ text, setText, onAdd }) {
   const items = splitTasks(text);
   return (
     <div className="card pad section">
@@ -23,17 +22,19 @@ function PasteBox({ onAdd }) {
 }
 
 function WipCard({ item, labels, groupsByDomain, onChange, onSend, onDiscard }) {
-  const [groupEdit, setGroupEdit] = useState(null); // null = use the suggestion
   const dest = item.domain;
   const isDomain = DOMAINS.includes(dest);
-  const group = groupEdit ?? (isDomain ? suggestGroup(item.task, groupsByDomain[dest]) : "");
+  // A group the user typed is kept on the item (so it survives a tab switch or reload);
+  // until then the field shows the suggestion.
+  const group = item.group ?? (isDomain ? suggestGroup(item.task, groupsByDomain[dest]) : "");
+  const setGroup = (g) => onChange({ group: g });
   const destLabel = !dest ? "" : isDomain ? labels[dest] : `AI · ${labels[dest]}`;
-  const pick = (opt) => { onChange({ domain: opt }); setGroupEdit(null); };
+  const pick = (opt) => onChange({ domain: opt });
   const destButton = (opt) => {
     const t = themeOf(opt);
     return (
       <button key={opt} className={`opt${dest === opt ? " on" : ""}`} aria-pressed={dest === opt} onClick={() => pick(opt)}
-        style={{ "--b": t.border, "--on": t.light, "--fill": t.accent }}>
+        style={{ "--b": t.border, "--on": t.light, "--fill": DOMAINS.includes(opt) ? t.accent : t.border }}>
         {labels[opt]}
       </button>
     );
@@ -49,7 +50,7 @@ function WipCard({ item, labels, groupsByDomain, onChange, onSend, onDiscard }) 
       {isDomain && (
         <>
           <div className="label dim">Group</div>
-          <GroupPicker value={group} onChange={setGroupEdit} groups={groupsByDomain[dest]} placeholder={DEFAULT_GROUP} />
+          <GroupPicker value={group} onChange={setGroup} groups={groupsByDomain[dest]} placeholder={DEFAULT_GROUP} />
         </>
       )}
 
@@ -59,7 +60,7 @@ function WipCard({ item, labels, groupsByDomain, onChange, onSend, onDiscard }) 
 
       <div className="row">
         <button className="primary f2" disabled={!dest} style={dest ? { "--light": themeOf(dest).light } : undefined}
-          onClick={() => onSend(group.trim() || DEFAULT_GROUP)}>
+          onClick={() => onSend(isDomain ? canonGroup(group, groupsByDomain[dest]) : "")}>
           {dest ? `✓ Send to ${destLabel}` : "Select a domain first"}
         </button>
         <button className="ghost" onClick={onDiscard}>✕ Discard</button>
@@ -68,8 +69,9 @@ function WipCard({ item, labels, groupsByDomain, onChange, onSend, onDiscard }) 
   );
 }
 
-export default function WipTab({ items, labels, groupsByDomain, setData }) {
+export default function WipTab({ items, labels, groupsByDomain, setData, draft, setDraft }) {
   const T = THEME.wip;
+  const lastSend = useRef(0);
 
   const addItems = (texts) => {
     const fresh = texts.map((task) => ({ id: newId(), task, domain: null, urgent: false, important: false }));
@@ -82,6 +84,9 @@ export default function WipTab({ items, labels, groupsByDomain, setData }) {
   const send = (item, group) => {
     const dest = item.domain;
     if (!dest) return;
+    // After a Send the next card slides up under the same finger: ignore a second tap that follows at once.
+    if (Date.now() - lastSend.current < 500) return;
+    lastSend.current = Date.now();
     const base = { id: newId(), task: item.task, completed: false, urgent: item.urgent, important: item.important };
     setData((d) => {
       if (!d.wip.some((p) => p.id === item.id)) return d;
@@ -101,7 +106,7 @@ export default function WipTab({ items, labels, groupsByDomain, setData }) {
         Assign domain + priority, then Send. Task disappears from here and goes live instantly.
       </p>
 
-      <PasteBox onAdd={addItems} />
+      <PasteBox text={draft} setText={setDraft} onAdd={addItems} />
 
       {items.length === 0 ? (
         <div className="card empty">

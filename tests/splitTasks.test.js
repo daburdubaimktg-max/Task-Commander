@@ -33,6 +33,11 @@ describe("splitTasks", () => {
     "Share the Top 5 list",
     "Finish chapter 2. Then rest",
     "Update the deck for Monday",
+    "UPDATE THE REPORT TODAY",
+    "Step 1. do x Step 2. do y",
+    "Read chapter 1. Then chapter 2. Then rest",
+    "Due 1. Dec 2. Jan",
+    "Open http://example.com/a;b=1 today",
   ])("leaves %j as one unchanged item", (t) => {
     expect(splitTasks(t)).toEqual([t]);
   });
@@ -46,6 +51,26 @@ describe("splitTasks", () => {
     expect(splitTasks("1. Book 2 tickets for 5 Dec 2. Top 5 review V2.5")).toEqual([
       "Book 2 tickets for 5 Dec", "Top 5 review V2.5",
     ]);
+  });
+  it("does not treat numbers inside a numbered item as the next item", () => {
+    expect(splitTasks("1. Meet at 2. 30 PM")).toEqual(["Meet at 2. 30 PM"]);
+    expect(splitTasks("1. Buy 2. 5 kg rice 2. Call")).toEqual(["Buy 2. 5 kg rice", "Call"]);
+  });
+  it("splits a list that follows a short intro, and drops the intro", () => {
+    expect(splitTasks("Tasks: 1. First 2. Second")).toEqual(["First", "Second"]);
+  });
+  it("splits on a semicolon inside a numbered list without merging the next item", () => {
+    expect(splitTasks("1. Email re: Q3; cc finance 2. Call")).toEqual(["Email re: Q3", "cc finance", "Call"]);
+  });
+  it("drops empty numbered items and handles dash bullets", () => {
+    expect(splitTasks("1.")).toEqual([]);
+    expect(splitTasks("1. \n2. real")).toEqual(["real"]);
+    expect(splitTasks("– one\n— two\n· three")).toEqual(["one", "two", "three"]);
+  });
+  it("stays fast on very long runs of spaces", () => {
+    const t0 = Date.now();
+    expect(splitTasks(`a${" ".repeat(200000)}b`)).toHaveLength(1);
+    expect(Date.now() - t0).toBeLessThan(500);
   });
   it("returns nothing for empty input", () => {
     expect(splitTasks("")).toEqual([]);

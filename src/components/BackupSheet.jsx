@@ -36,7 +36,7 @@ async function copyText(text) {
   }
 }
 
-export default function BackupSheet({ state, canUndo, onBackedUp, onReplace, onAdd, onUndo, onClose }) {
+export default function BackupSheet({ state, canUndo, importOnly = false, onBackedUp, onReplace, onAdd, onUndo, onClose }) {
   const [msg, setMsg] = useState(null); // { kind: "ok" | "err", text }
   const [pasted, setPasted] = useState("");
   const [preview, setPreview] = useState(null); // parsed incoming state
@@ -103,17 +103,21 @@ export default function BackupSheet({ state, canUndo, onBackedUp, onReplace, onA
   };
 
   const apply = (fn, text) => {
-    fn(preview);
+    const result = fn(preview);
     setPreview(null);
     setPasted("");
-    setMsg({ kind: "ok", text });
+    const counts = result && typeof result.added === "number"
+      ? `Imported. ${result.added} added, ${result.skipped} already here and skipped.`
+      : text;
+    setMsg({ kind: "ok", text: counts });
+    if (importOnly) onClose();
   };
 
   return (
     <Sheet title="Backup" theme={vars(THEME.wip)} onClose={onClose}>
       <p className="note mb">
         Your tasks live only on this phone. Deleting the home-screen icon or clearing Safari data erases them, so keep a backup file.
-        {" "}{last ? `Last backup: ${last.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}.` : "No backup yet."}
+        {" "}{importOnly ? "" : last ? `Last backup: ${last.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}.` : "No backup yet."}
       </p>
 
       {msg && <div className={`msg ${msg.kind}`} role="status">{msg.text}</div>}
@@ -128,25 +132,31 @@ export default function BackupSheet({ state, canUndo, onBackedUp, onReplace, onA
         <>
           <div className="msg preview">
             <b>This backup contains</b><br />{summarize(preview)}
-            <br /><span className="muted">On this phone now: {summarize(state)}</span>
+            {!importOnly && <><br /><span className="muted">On this phone now: {summarize(state)}</span></>}
           </div>
           <button className="primary mb" onClick={() => apply(onReplace, "Imported. Everything was replaced by the backup.")}>
-            Replace everything
+            {importOnly ? "Import this backup" : "Replace everything"}
           </button>
           <div className="row">
-            <button className="ghost" onClick={() => apply(onAdd, "Imported. New tasks were added to what was already here.")}>Add to existing</button>
+            {!importOnly && (
+              <button className="ghost" onClick={() => apply(onAdd, "Imported. New tasks were added to what was already here.")}>Add to existing</button>
+            )}
             <button className="ghost" onClick={() => setPreview(null)}>Cancel</button>
           </div>
         </>
       ) : (
         <>
-          <div className="label dim">Save a backup</div>
-          <div className="row mb">
-            <button className="opt" disabled={!has} onClick={exportBackup}><Download size={15} /> Export backup</button>
-            <button className="opt" disabled={!has} onClick={copyBackup}><ClipboardCopy size={15} /> Copy backup text</button>
-          </div>
+          {!importOnly && (
+            <>
+              <div className="label dim">Save a backup</div>
+              <div className="row mb">
+                <button className="opt" disabled={!has} onClick={exportBackup}><Download size={15} /> Export backup</button>
+                <button className="opt" disabled={!has} onClick={copyBackup}><ClipboardCopy size={15} /> Copy backup text</button>
+              </div>
+            </>
+          )}
 
-          <div className="divider">
+          <div className={importOnly ? undefined : "divider"}>
             <div className="label dim">Import a backup</div>
             <label className="opt file-btn mb">
               <Upload size={15} /> Choose backup file

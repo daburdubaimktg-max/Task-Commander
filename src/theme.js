@@ -22,8 +22,8 @@ export const DOT = {
 
 // Darker versions of the same hues, for text on the white Super Matrix.
 export const DOT_ON_WHITE = {
-  work: "#1d6fd6", personal: "#1f8f4a", seva: "#b4440c",
-  ai1: "#d0358a", ai2: "#0b8f63", ai3: "#6d4fd6", ai4: "#c77700",
+  work: "#1d6fd6", personal: "#177a3d", seva: "#b4440c",
+  ai1: "#c72c80", ai2: "#087a55", ai3: "#6d4fd6", ai4: "#b36b00",
 };
 
 export const themeOf = (key) => THEME[key] || AI_SUB[key];

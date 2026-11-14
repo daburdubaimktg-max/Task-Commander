@@ -11,20 +11,39 @@ export const PERSIST_KEY = "tcc_persist_requested";
 const store = (s) => s || globalThis.localStorage;
 
 // No merging with a seed: what was saved is what loads.
+// If the saved data cannot be read, `blocked` is set and the caller must NOT save until the
+// user decides what to do — otherwise the first edit would overwrite the old tasks.
 export function loadState(storage) {
   let raw = null;
   try {
     raw = store(storage).getItem(KEY);
   } catch (e) {
-    return { state: defaultState(), firstRun: true, error: `Could not read saved data (${e.message}).` };
+    return { state: defaultState(), firstRun: false, blocked: { reason: "read", raw: null, detail: e?.message || "" } };
   }
-  if (raw === null) return { state: defaultState(), firstRun: true, error: null };
+  if (raw === null) return { state: defaultState(), firstRun: true, blocked: null };
+  let parsed;
   try {
-    return { state: normalizeState(JSON.parse(raw)), firstRun: false, error: null };
+    parsed = JSON.parse(raw);
+  } catch {
+    return { state: defaultState(), firstRun: false, blocked: { reason: "damaged", raw, detail: "" } };
+  }
+  try {
+    return { state: normalizeState(parsed, { lenient: true }), firstRun: false, blocked: null };
   } catch (e) {
-    // Keep the unreadable copy so it is not lost when the next save happens.
-    try { store(storage).setItem(CORRUPT_KEY, raw); } catch { /* nothing more we can do */ }
-    return { state: defaultState(), firstRun: true, error: "Saved data could not be read. Import your last backup." };
+    return { state: defaultState(), firstRun: false, blocked: { reason: "damaged", raw, detail: e?.message || "" } };
+  }
+}
+
+// Best-effort spare copy of unreadable data, written only when the user chooses to move on.
+// An earlier spare copy is never overwritten.
+export function keepUnreadable(raw, storage) {
+  if (typeof raw !== "string") return false;
+  try {
+    const s = store(storage);
+    if (s.getItem(CORRUPT_KEY) === null) s.setItem(CORRUPT_KEY, raw);
+    return true;
+  } catch {
+    return false;
   }
 }
 

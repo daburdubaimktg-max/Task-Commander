@@ -11,7 +11,7 @@ function AiEditSheet({ task, theme, onSave, onDelete, onClose }) {
   return (
     <Sheet title="Edit AI Task" theme={theme} onClose={onClose}>
       <div className="label dim">Task Text</div>
-      <textarea className="field mb" rows={3} value={txt} onChange={(e) => setTxt(e.target.value)} />
+      <textarea className="field mb" rows={3} value={txt} onChange={(e) => setTxt(e.target.value)} aria-label="Task text" />
       <div className="label dim">Priority</div>
       <PriorityButtons urgent={u} important={i} onUrgent={() => setU((x) => !x)} onImportant={() => setI((x) => !x)} />
       <div className="row">
@@ -23,8 +23,7 @@ function AiEditSheet({ task, theme, onSave, onDelete, onClose }) {
   );
 }
 
-export default function AiTab({ ai, labels, setData }) {
-  const [sub, setSub] = useState("ai1");
+export default function AiTab({ ai, labels, setData, sub, setSub }) {
   const [editingId, setEditingId] = useState(null);
   const [newTxt, setNewTxt] = useState("");
   const [newU, setNewU] = useState(false);
@@ -62,9 +61,9 @@ export default function AiTab({ ai, labels, setData }) {
         <AiEditSheet key={editing.id} task={editing} theme={vars(S)} onSave={saveEdit} onDelete={deleteTask} onClose={() => setEditingId(null)} />
       )}
 
-      <div className="subtabs">
+      <div className="subtabs" role="tablist">
         {AI_KEYS.map((k) => (
-          <button key={k} className={`tab${sub === k ? " on" : ""}`} style={{ "--c": AI_SUB[k].light }}
+          <button key={k} role="tab" aria-selected={sub === k} className={`tab${sub === k ? " on" : ""}`} style={{ "--c": AI_SUB[k].light }}
             onClick={() => { setSub(k); setEditingId(null); }}>
             {labels[k]}
           </button>
@@ -89,7 +88,7 @@ export default function AiTab({ ai, labels, setData }) {
 
         <div className="card pad section">
           <div className="label">+ Add New Task</div>
-          <textarea className="field" rows={2} value={newTxt} onChange={(e) => setNewTxt(e.target.value)} placeholder="Type task..."
+          <textarea className="field" rows={2} value={newTxt} onChange={(e) => setNewTxt(e.target.value)} placeholder="Type task..." aria-label="New task"
             style={{ marginBottom: 10 }} />
           <PriorityButtons urgent={newU} important={newI} onUrgent={() => setNewU((x) => !x)} onImportant={() => setNewI((x) => !x)} />
           <button className="primary" disabled={!newTxt.trim()} onClick={addTask}>✓ Add to {labels[sub]}</button>

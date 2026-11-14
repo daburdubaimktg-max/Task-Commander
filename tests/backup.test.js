@@ -48,6 +48,9 @@ describe("import", () => {
   it("accepts text pasted with code fences or a byte-order mark", () => {
     expect(countTasks(parseBackup("```json\n" + fixtureText + "\n```")).work).toBe(4);
     expect(countTasks(parseBackup("\uFEFF" + fixtureText)).work).toBe(4);
+    expect(countTasks(parseBackup(fixtureText + "\n\nSent from my iPhone")).work).toBe(4);
+    expect(countTasks(parseBackup(fixtureText.replace(/"/g, (q, i) => (i % 2 ? "\u201D" : "\u201C")))).work).toBe(4);
+    expect(countTasks(parseBackup(fixtureText.replace(/\n  /g, "\n\u00A0\u00A0"))).work).toBe(4);
   });
   it("cuts long tab names by whole characters", () => {
     const s = parseBackup(JSON.stringify({ format: "task-command-center/v1", labels: { ai1: "a".repeat(39) + "😀 tail" }, data: {} }));

@@ -22,13 +22,20 @@ export function backupFilename(now = new Date()) {
 // Text of a backup file → clean state. Throws BackupError with a plain message.
 export function parseBackup(text) {
   if (typeof text !== "string" || !text.trim()) throw new BackupError("Nothing to import yet. Choose a file or paste the backup text.");
+  // Text pasted through Notes, mail or a chat app may arrive with a byte-order mark, inside ``` fences,
+  // with a signature line after it, or with "smart" quotes and non-breaking spaces. Take what lies
+  // between the first { and the last }, and only if that fails, undo the smart punctuation.
+  const first = text.indexOf("{"), last = text.lastIndexOf("}");
+  const body = first >= 0 && last > first ? text.slice(first, last + 1) : text.trim();
   let raw;
-  // Text pasted through Notes or a chat app may arrive with a byte-order mark or inside ``` fences.
-  const body = text.replace(/^\uFEFF/, "").trim().replace(/^```[a-z]*\s*/i, "").replace(/```\s*$/, "").trim();
   try {
     raw = JSON.parse(body);
   } catch {
-    throw new BackupError("This is not a backup file: the text could not be read. Paste the whole backup, from the first { to the last }.");
+    try {
+      raw = JSON.parse(body.replace(/[\u201C\u201D]/g, '"').replace(/\u00A0/g, " "));
+    } catch {
+      throw new BackupError("This is not a backup file: the text could not be read. Export a fresh backup and try again, or use the file instead of pasted text.");
+    }
   }
   const state = normalizeState(raw);
   // Imported data is as fresh as the moment it was exported.

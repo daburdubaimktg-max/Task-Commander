@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Briefcase, Heart, Inbox, LayoutGrid, Settings, User, X, Zap } from "lucide-react";
-import { DOMAINS, defaultState, groupsOf } from "./lib/model.js";
+import { flushSync } from "react-dom";
+import { Briefcase, Heart, Inbox, LayoutGrid, Plus, Settings, User, X, Zap } from "lucide-react";
+import { DOMAINS, defaultState, groupsOf, newId } from "./lib/model.js";
 import { backupNudge, mergeAdd } from "./lib/backup.js";
 import { NUDGE_KEY, PERSIST_KEY, PREV_KEY, getItem, keepUnreadable, loadState, removeItem, saveState, setItem } from "./lib/storage.js";
 import { THEME, vars } from "./theme.js";
@@ -10,6 +11,7 @@ import AiTab from "./components/AiTab.jsx";
 import SuperMatrix from "./components/SuperMatrix.jsx";
 import BackupSheet from "./components/BackupSheet.jsx";
 import Recovery from "./components/Recovery.jsx";
+import QuickCapture from "./components/QuickCapture.jsx";
 
 function boot() {
   removeItem(PREV_KEY); // "Undo import" lasts only until the app is closed
@@ -29,6 +31,8 @@ export default function App() {
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [backupOpen, setBackupOpen] = useState(false);
+  const [captureOpen, setCaptureOpen] = useState(false);
+  const captureRef = useRef(null);
   const [undo, setUndo] = useState(null);
   const [nudgeDismissedAt, setNudgeDismissedAt] = useState(() => getItem(NUDGE_KEY));
   const lastSaved = useRef(store);
@@ -90,6 +94,17 @@ export default function App() {
     setStore((s) => ({ ...s, data: fn(s.data) }));
   };
   const { data, labels } = store;
+
+  // iOS only raises the keyboard when focus happens inside the tap itself, so the sheet is
+  // rendered synchronously and its text box focused before the handler returns.
+  const openCapture = () => {
+    flushSync(() => setCaptureOpen(true));
+    captureRef.current?.focus();
+  };
+  const addToWip = (texts) => {
+    const fresh = texts.map((task) => ({ id: newId(), task, domain: null, urgent: false, important: false }));
+    setData((d) => ({ ...d, wip: [...d.wip, ...fresh] }));
+  };
 
   const groupsByDomain = useMemo(
     () => Object.fromEntries(DOMAINS.map((d) => [d, groupsOf(store, d)])),
@@ -212,6 +227,7 @@ export default function App() {
             <div className={`progress-text${saved ? " hide" : ""}`}>{done}/{all.length} · {pct}%</div>
             <div className="bar global"><i style={{ width: `${pct}%` }} /></div>
           </div>
+          <button className="icon-btn add" aria-label="Quick add to WIP" onClick={openCapture}><Plus size={22} strokeWidth={2.6} /></button>
           <button className="icon-btn" aria-label="Backup" onClick={() => setBackupOpen(true)}><Settings size={20} /></button>
         </div>
 
@@ -251,6 +267,9 @@ export default function App() {
         {tab === "matrix" && <SuperMatrix state={store} />}
       </div>
 
+      {captureOpen && (
+        <QuickCapture ref={captureRef} text={wipDraft} setText={setWipDraft} onAdd={addToWip} onClose={() => setCaptureOpen(false)} />
+      )}
       {backupOpen && (
         <BackupSheet state={store} canUndo={!!undo} onBackedUp={markBackedUp} onReplace={importReplace} onAdd={importAdd}
           onUndo={undoImport} onClose={() => setBackupOpen(false)} />

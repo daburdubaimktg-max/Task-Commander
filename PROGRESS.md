@@ -67,6 +67,12 @@ Fixed as a result:
 Left as is, on purpose: a half-typed AI task follows you between sub-tabs (same as the reference, and the
 button names the destination); the "groups" figure in the import preview counts groups per tab.
 
+## Quick add (14 Nov 2026)
+
+A "+" button in the header opens a capture sheet from any tab with the text box already focused, so the
+keyboard — typing or a dictation keyboard such as Wispr Flow — comes up in one tap. Items go to WIP. The
+draft is shared with the WIP paste box, so closing the sheet never loses dictated text.
+
 ## Next step
 
 Put the code on `main`, switch Pages to GitHub Actions, open the link on the iPhone and run the acceptance test.

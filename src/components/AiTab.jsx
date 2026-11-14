@@ -57,7 +57,7 @@ export default function AiTab({ ai, labels, setData }) {
   const p = Progress({ done: tasks.filter((t) => t.completed).length, total: tasks.length });
 
   return (
-    <div style={{ ...vars(S), background: "#080810", minHeight: "100%" }}>
+    <div className="ai-wrap" style={vars(S)}>
       {editing && (
         <AiEditSheet key={editing.id} task={editing} theme={vars(S)} onSave={saveEdit} onDelete={deleteTask} onClose={() => setEditingId(null)} />
       )}
@@ -71,7 +71,7 @@ export default function AiTab({ ai, labels, setData }) {
         ))}
       </div>
 
-      <div className="page" style={{ background: "transparent" }}>
+      <div className="page">
         <div className="page-head">
           <div style={{ minWidth: 0 }}>
             <h2 style={{ fontSize: 18 }}>{labels.ai} · {labels[sub]}</h2>

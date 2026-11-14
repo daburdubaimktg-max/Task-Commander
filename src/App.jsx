@@ -130,12 +130,18 @@ export default function App() {
       <div className="header">
         <div className="header-top">
           <div className="title-wrap">
-            <div className="title">Task Command Center</div>
+            <div className="title">
+              <span className="logo" aria-hidden="true">
+                <i style={{ background: "#5ba3f5" }} /><i style={{ background: "#52c97a" }} />
+                <i style={{ background: "#e07b35" }} /><i style={{ background: "#9b7fe8" }} />
+              </span>
+              <span>Task Command Center</span>
+            </div>
             <div className="subtitle">Offline · saved on this phone</div>
           </div>
-          <div className={`saved${saved ? " on" : ""}`} aria-live="polite">{saved ? "✓ Saved" : ""}</div>
           <div className="progress-wrap">
-            <div className="progress-text">{done}/{all.length} · {pct}%</div>
+            <div className={`saved${saved ? " on" : ""}`} aria-live="polite">{saved ? "✓ Saved" : ""}</div>
+            <div className={`progress-text${saved ? " hide" : ""}`}>{done}/{all.length} · {pct}%</div>
             <div className="bar global"><i style={{ width: `${pct}%` }} /></div>
           </div>
           <button className="icon-btn" aria-label="Backup" onClick={() => setBackupOpen(true)}><Settings size={20} /></button>

@@ -161,3 +161,94 @@ textarea.field { resize: vertical; }
 .file-btn input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 16px; }
 .welcome { margin-bottom: 18px; }
 .welcome h3 { margin: 0 0 6px; font-size: 16px; color: #e2e8f0; }
+
+/* ───────────── visual polish (same layout, same colours, more depth) ───────────── */
+body { font-feature-settings: "tnum" 1; -webkit-font-smoothing: antialiased; }
+
+.header { background: linear-gradient(180deg, #0c0c18 0%, #080810 100%); border-bottom-color: #1c1c30; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
+.title { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+.logo { width: 18px; height: 18px; flex-shrink: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; }
+.logo i { border-radius: 2.5px; }
+.title > span { overflow: hidden; text-overflow: ellipsis; }
+.bar.global { height: 4px; }
+.bar > i { box-shadow: 0 0 8px color-mix(in srgb, var(--light, #5ba3f5) 60%, transparent); }
+.saved { transform: translateY(2px); opacity: 0; }
+.saved.on { transform: none; opacity: 1; }
+.icon-btn:active { background: rgba(255,255,255,0.08); }
+
+.tabs { gap: 2px; padding: 4px 8px 0; }
+.tab { border-radius: 10px 10px 0 0; border-bottom-width: 3px; }
+.tab.on { background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--c) 14%, transparent)); }
+.tab:active { background: rgba(255,255,255,0.05); }
+.badge { box-shadow: 0 0 0 3px rgba(155,127,232,0.2); }
+
+.page {
+  background:
+    radial-gradient(130% 320px at 50% -80px, color-mix(in srgb, var(--light) 16%, transparent), transparent 70%),
+    var(--bg);
+  animation: rise 0.22s ease-out;
+}
+.ai-wrap { background: radial-gradient(130% 320px at 50% -40px, color-mix(in srgb, var(--light) 14%, transparent), transparent 70%), #080810; min-height: 100%; }
+.ai-wrap .page { background: transparent; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.page-head h2 { font-size: 22px; letter-spacing: -0.4px; }
+.label { letter-spacing: 1.2px; }
+
+.card {
+  border-radius: 14px;
+  border-color: color-mix(in srgb, var(--border) 80%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--card) 92%, #fff), var(--card));
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 22px rgba(0,0,0,0.28);
+}
+.group-head { background: color-mix(in srgb, var(--light) 7%, transparent); align-items: center; }
+.group-head .muted { background: color-mix(in srgb, var(--light) 14%, transparent); color: var(--light); font-weight: 700; padding: 1px 8px; border-radius: 99px; }
+
+.btn-new { border-radius: 12px; border-color: color-mix(in srgb, var(--light) 70%, transparent); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 80%, var(--light)), var(--accent)); box-shadow: 0 6px 16px color-mix(in srgb, var(--light) 22%, transparent); }
+.primary { border-radius: 12px; background: linear-gradient(180deg, color-mix(in srgb, var(--light) 88%, #fff), var(--light)); box-shadow: 0 6px 16px color-mix(in srgb, var(--light) 28%, transparent); }
+.primary:disabled { background: #232334; box-shadow: none; }
+.ghost, .danger, .opt { border-radius: 12px; }
+.btn-new:active, .primary:not(:disabled):active, .ghost:active, .opt:active, .chip:active, .danger:active { transform: scale(0.97); }
+.btn-new, .primary, .ghost, .opt, .chip, .danger { transition: transform 0.08s, background 0.15s, border-color 0.15s, color 0.15s; }
+.opt.on { box-shadow: 0 0 0 3px color-mix(in srgb, var(--on) 18%, transparent); }
+.field { border-radius: 12px; transition: border-color 0.15s, box-shadow 0.15s; }
+.field:focus { outline: none; border-color: var(--light); box-shadow: 0 0 0 3px color-mix(in srgb, var(--light) 22%, transparent); }
+.chip { background: rgba(255,255,255,0.03); }
+.chip.on { background: color-mix(in srgb, var(--light) 14%, transparent); }
+
+.mcell { border-radius: 14px; border-width: 1px; background: linear-gradient(180deg, color-mix(in srgb, var(--mc) 9%, transparent), rgba(255,255,255,0.02)); box-shadow: 0 6px 16px rgba(0,0,0,0.22); }
+.mcell-count { background: color-mix(in srgb, var(--mc) 15%, transparent); padding: 2px 6px 2px 9px; border-radius: 99px; }
+.mitem { border-radius: 8px; border-left-width: 3px; background: rgba(255,255,255,0.05); }
+
+.task-row { transition: background 0.15s; }
+.task-row.done { background: rgba(0,0,0,0.12); }
+.box { border-radius: 7px; transition: background 0.15s, border-color 0.15s, transform 0.15s; border-color: color-mix(in srgb, var(--light) 45%, var(--border)); }
+.box.on { transform: scale(1.06); box-shadow: 0 0 10px color-mix(in srgb, var(--light) 45%, transparent); }
+.pill { border-radius: 10px; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.hit:active .pill, .hit:active .box { transform: scale(0.9); }
+
+.subtabs { background: rgba(13,11,24,0.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+
+.super { background-color: #f4f4f4; background-image: linear-gradient(180deg, #ffffff, #f4f4f4 240px); animation: none; }
+.super h2 { font-size: 22px; letter-spacing: -0.4px; }
+.legend span { background: #fff; border: 1px solid #e6e7eb; border-radius: 99px; padding: 3px 9px; }
+.legend span:first-child { background: transparent; border: none; padding: 0; }
+.scell { border-radius: 14px; border-width: 1px; box-shadow: 0 8px 20px rgba(17,24,39,0.07); }
+.super .mitem { background: #fff; box-shadow: 0 1px 2px rgba(17,24,39,0.06); }
+
+.sheet-backdrop { background: rgba(4,4,10,0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: fade 0.15s ease-out; }
+.sheet { border-radius: 18px; box-shadow: 0 24px 60px rgba(0,0,0,0.6); animation: pop 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.1); }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.msg { border-radius: 12px; }
+.empty { border-style: dashed; box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* "✓ Saved" takes the place of the progress count for a moment, so the title keeps its room */
+.progress-wrap { position: relative; min-width: 72px; }
+.saved { position: absolute; right: 0; top: -3px; padding: 1px 8px; pointer-events: none; }
+.progress-text { transition: opacity 0.2s; }
+.progress-text.hide { opacity: 0; }

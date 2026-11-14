@@ -1,0 +1,9 @@
+node_modules
+dist
+dev-dist
+.DS_Store
+*.local
+# Private files that must never be committed
+HANDOVER*.md
+*-tasks-backup.json
+task-command-center-*.json

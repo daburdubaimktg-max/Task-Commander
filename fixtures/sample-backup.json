@@ -1,0 +1,41 @@
+{
+  "format": "task-command-center/v1",
+  "exportedAt": "2026-11-13T10:00:00.000Z",
+  "labels": {
+    "work": "Work",
+    "personal": "Personal",
+    "seva": "Seva",
+    "ai": "AI Learning",
+    "ai1": "TEAM AI",
+    "ai2": "HOME AI",
+    "ai3": "STUDY",
+    "ai4": "COMMUNITY"
+  },
+  "data": {
+    "work": [
+      { "id": "w1", "group": "Planning", "task": "Prepare Monday team review", "completed": false, "urgent": true, "important": true },
+      { "id": "w2", "group": "Planning", "task": "Draft Q1 budget notes", "completed": false, "urgent": false, "important": true },
+      { "id": "w3", "group": "Marketing", "task": "Review agency media plan", "completed": true, "urgent": true, "important": true },
+      { "id": "w4", "group": "Admin", "task": "Clear expense claims", "completed": false, "urgent": true, "important": false }
+    ],
+    "personal": [
+      { "id": "p1", "group": "Home", "task": "Book car service", "completed": false, "urgent": true, "important": false },
+      { "id": "p2", "group": "Health", "task": "Morning walk 30 minutes", "completed": false, "urgent": false, "important": true },
+      { "id": "p3", "group": "Shopping", "task": "Buy printer ink", "completed": false, "urgent": false, "important": false }
+    ],
+    "seva": [
+      { "id": "s1", "group": "Community", "task": "Volunteer rota for Sunday", "completed": false, "urgent": true, "important": true },
+      { "id": "s2", "group": "Practice", "task": "Read 20 pages", "completed": false, "urgent": false, "important": true }
+    ],
+    "wip": [
+      { "id": "i1", "task": "Call the plumber", "domain": null, "urgent": false, "important": false },
+      { "id": "i2", "task": "Try the new note-taking tool", "domain": null, "urgent": false, "important": false }
+    ],
+    "ai": {
+      "ai1": [ { "id": "a1", "task": "Write five prompt templates for the team", "completed": false, "urgent": false, "important": true } ],
+      "ai2": [ { "id": "a2", "task": "Set up a home budget tracker", "completed": false, "urgent": false, "important": true } ],
+      "ai3": [ { "id": "a3", "task": "Shortlist three online courses", "completed": false, "urgent": true, "important": true } ],
+      "ai4": []
+    }
+  }
+}

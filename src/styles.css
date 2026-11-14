@@ -222,3 +222,20 @@ textarea.field { resize: vertical; }
 @media (max-width: 380px) { .logo { display: none; } }
 @media (max-width: 359px) { .title { font-size: 14px; } .header-top { padding-left: 10px; } .progress-wrap { display: none; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ── voice sheet ── */
+.vlist { display: flex; flex-direction: column; gap: 6px; }
+.vrow { display: flex; align-items: flex-start; background: var(--card-2); border: 1px solid var(--line); border-left: 3px solid var(--light, var(--border)); border-radius: 12px; padding: 2px 10px 2px 0; }
+.vrow.del { border-left-color: var(--urgent); }
+.vbody { flex: 1; min-width: 0; padding: 9px 0; }
+.vverb { font-size: 12px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--light, var(--muted)); }
+.vrow.del .vverb, .vverb.warn { color: var(--urgent); }
+.vtext { font-size: 15px; color: var(--text); line-height: 1.4; overflow-wrap: anywhere; }
+.vpick { width: 100%; justify-content: flex-start; text-align: left; padding: 6px 12px; margin-bottom: 6px; font-weight: 500; }
+.vpick.on { border-color: var(--strong, #6447c4); background: var(--info-bg); font-weight: 700; }
+.vplace { color: var(--muted); font-weight: 400; }
+.vhelp { font-size: 14px; line-height: 1.6; }
+.hit:disabled { opacity: 0.4; }
+.vrow.del .box.on { background: #c81e1e; border-color: #c81e1e; }
+.vrow.nomatch { border-left-color: var(--urgent); }
+.vrow.nomatch .box.on { background: #6447c4; border-color: #6447c4; }

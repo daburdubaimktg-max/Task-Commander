@@ -48,7 +48,7 @@ export const CLAUDE_PROJECT_INSTRUCTIONS = [
   "- A block that starts with TASK COMMAND CENTER and lists my open tasks by tab and quadrant. Treat the newest block as the truth and forget older ones. You cannot see the app; you only know what I paste.",
   "",
   "What I want back",
-  "- When I ask for new tasks, or when your advice produces tasks, end your reply with one line in exactly this form, so I can paste it into the app's Quick add box:",
+  "- When I ask for new tasks, or when your advice produces tasks, end your reply with one line in exactly this form, so I can paste it into the app's Voice box (the mic button):",
   "  UPDATE: 1. first task 2. second task 3. third task",
   "- Keep each task short, start it with a verb, and do not put numbers followed by a full stop inside a task.",
   "- After each task you may add where it should go, in brackets at the end, for example (Work, urgent). I sort tasks myself in the app.",

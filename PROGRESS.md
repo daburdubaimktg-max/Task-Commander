@@ -7,7 +7,7 @@
 - All of CLAUDE.md §6: iPhone shell (safe areas, 44 pt targets, 16 px fields, offline service worker, icons),
   paste box in WIP, WIP → AI sub-tabs, suggested group, Backup sheet (export, copy, import with preview,
   replace / add, undo import, 7-day nudge, welcome card), data fixes (no seed merge, one WIP list, UUID ids, visible save failures).
-- 67 unit tests (`npm test`), run by the deploy workflow before every deploy.
+- 78 unit tests (`npm test`), run by the deploy workflow before every deploy.
 - Deploy workflow: `.github/workflows/deploy.yml` (push to `main` → test → build → GitHub Pages).
 
 ## Live URL
@@ -80,6 +80,14 @@ draft is shared with the WIP paste box, so closing the sheet never loses dictate
   visible text measured at 4.5:1 or better in both modes on six screens.
 - Gear sheet: "Copy tasks for Claude" and "Copy instructions for the Claude project". Copy-and-paste only;
   the app still sends nothing anywhere.
+
+## Voice section (14 Nov 2026)
+
+The header "+" became a mic button. It opens a Voice sheet from any tab: dictate or type, see a preview of
+what the app understood, tick or untick rows, then Apply. It can add tasks (to WIP, or straight to a tab
+with priority), mark done, set or clear urgent / important, move between tabs, and delete (needs a tick to
+confirm). 11 unit tests cover the interpreter; the sheet was driven end to end in light and dark.
+Not verified on a real iPhone: the built-in mic button, and Wispr Flow inside the installed app.
 
 ## Next step
 
